@@ -66,7 +66,7 @@ def nm(theta, y_hat, X_T, dist, cost, lr):
 	print("\n\n" + "y_hat, y")
 	for i in indices:
 		print(y_hat[i], Y[i])
-	
+	print(cost_log)
 	plt.plot(cost_log)
 	plt.xlabel("Epochs")
 	plt.ylabel("MSE Cost")
