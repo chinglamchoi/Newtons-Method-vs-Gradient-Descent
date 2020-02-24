@@ -10,6 +10,7 @@ from sklearn import datasets
 import numpy as np
 import numpy.linalg as lnp
 from time import time
+import matplotlib.pyplot as plt
 
 #np.random.seed(1)
 
@@ -58,13 +59,20 @@ def nm(theta, y_hat, X_T, dist, cost, lr):
 		dist = Y-y_hat
 		X_T = X.T
 		cost = MSE(dist)
+		cost_log.append(cost)
 	end = time()
-	cost_log.append(cost)
 	print("\n" + "Finished NM in " + str(epoch+1), "epochs with error " + str(cost_log[-1]) + "\n")
 	print("Optimal theta:", theta)
 	print("\n\n" + "y_hat, y")
 	for i in indices:
 		print(y_hat[i], Y[i])
+	
+	plt.plot(cost_log)
+	plt.xlabel("Epochs")
+	plt.ylabel("MSE Cost")
+	plt.title("Newton's Method")
+	plt.show() #can save too
+	# might not be able to plot cuz too few epochs
 	return end-start
 
 def gd(theta, y_hat, X_T, dist, cost, lr):
@@ -83,14 +91,20 @@ def gd(theta, y_hat, X_T, dist, cost, lr):
 		dist = Y-y_hat
 		X_T = X.T
 		cost = MSE(dist)
+		cost_log.append(cost)
 	end = time()
-	cost_log.append(cost)
 	print("\n" + "Finished GD in " + str(epoch+1), "epochs with error " + str(cost_log[-1]) + "\n")
 	print("Optimal theta:", theta)
 
 	print("\n\n" + "y_hat, y")
 	for i in indices:
 		print(y_hat[i], Y[i])
+		
+	plt.plot(cost_log)
+	plt.xlabel("Epochs")
+	plt.ylabel("MSE Cost")
+	plt.title("Gradient Descent")
+	plt.show() #can save too
 	return end-start
 
 indices = [np.random.randint(0,m) for i in range(10)] #randomly sample 10 pairs for testing
