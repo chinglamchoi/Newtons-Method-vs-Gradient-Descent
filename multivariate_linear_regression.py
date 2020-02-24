@@ -51,6 +51,7 @@ def nm(theta, y_hat, X_T, dist, cost, lr):
 	while cost > margin:
 		#cost_log.append(cost) #commented for timing
 		#print("Epoch #" + str(epoch) + ":", cost)
+		cost_log.append(cost)
 		epoch += 1
 		grad = np.matmul(X_T, dist/-m)
 		theta = theta-lr*np.matmul(inv_hessian, grad)
@@ -59,21 +60,15 @@ def nm(theta, y_hat, X_T, dist, cost, lr):
 		dist = Y-y_hat
 		X_T = X.T
 		cost = MSE(dist)
-		cost_log.append(cost)
+	cost_log.append(cost)
 	end = time()
 	print("\n" + "Finished NM in " + str(epoch+1), "epochs with error " + str(cost_log[-1]) + "\n")
 	print("Optimal theta:", theta)
 	print("\n\n" + "y_hat, y")
 	for i in indices:
 		print(y_hat[i], Y[i])
-	print(cost_log)
-	plt.plot(cost_log)
-	plt.xlabel("Epochs")
-	plt.ylabel("MSE Cost")
-	plt.title("Newton's Method")
-	plt.show() #can save too
-	# might not be able to plot cuz too few epochs
-	return end-start
+
+	return end-start, cost_log
 
 def gd(theta, y_hat, X_T, dist, cost, lr):
 	start = time()
@@ -82,6 +77,7 @@ def gd(theta, y_hat, X_T, dist, cost, lr):
 	epoch = 0
 	
 	while cost > margin:
+		cost_log.append(cost)
 		#cost_log.append(cost) #commented for timing
 		epoch += 1
 		grad = np.matmul(X_T, dist)/-m
@@ -91,7 +87,7 @@ def gd(theta, y_hat, X_T, dist, cost, lr):
 		dist = Y-y_hat
 		X_T = X.T
 		cost = MSE(dist)
-		cost_log.append(cost)
+	cost_log.append(cost)
 	end = time()
 	print("\n" + "Finished GD in " + str(epoch+1), "epochs with error " + str(cost_log[-1]) + "\n")
 	print("Optimal theta:", theta)
@@ -99,22 +95,25 @@ def gd(theta, y_hat, X_T, dist, cost, lr):
 	print("\n\n" + "y_hat, y")
 	for i in indices:
 		print(y_hat[i], Y[i])
-		
-	plt.plot(cost_log)
-	plt.xlabel("Epochs")
-	plt.ylabel("MSE Cost")
-	plt.title("Gradient Descent")
-	plt.show() #can save too
-	return end-start
+
+	return end-start, cost_log
 
 indices = [np.random.randint(0,m) for i in range(10)] #randomly sample 10 pairs for testing
 #print(theta)
 
-GD_time = gd(theta, y_hat, X_T, dist, cost, 0.032) # max 3 dp. cuz overflow
+GD_time, gd_log = gd(theta, y_hat, X_T, dist, cost, 0.032) # max 3 dp. cuz overflow
 print("\n\n" + "#"*10 + "\n\n")
-NM_time = nm(theta, y_hat, X_T, dist, cost, 150)
+NM_time, nm_log = nm(theta, y_hat, X_T, dist, cost, 150)
 
 print("\n\n\n" + "GD time", GD_time, "| NM time", NM_time)
+
+plt.plot(gd_log, label="GD")
+plt.plot(nm_log, label="NM")
+plt.xlabel("Epochs")
+plt.ylabel("MSE Cost")
+plt.title("Newton's Method vs. Gradient Descent")
+plt.show() #can save too
+
 if GD_time > NM_time:
 	print("NM is faster")
 	#if runtime is to fast, can't always tell cuz of sig fig
